@@ -1,0 +1,2256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Auto Rash '91 | Junction Rush — 16-Bit Sega Genesis Tribute</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #05070c;
+      color: #f8fafc;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    canvas {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      -ms-interpolation-mode: nearest-neighbor;
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    /* Retro CRT Scanline Effect */
+    .crt-scanlines {
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 0, 0, 0.25) 50%
+      );
+      background-size: 100% 4px;
+      pointer-events: none;
+    }
+    /* Sega Genesis 16-Bit Cyan Title Backdrop */
+    .sega-cyan-bg {
+      background: repeating-linear-gradient(
+        0deg,
+        #0284c7,
+        #0284c7 4px,
+        #0369a1 4px,
+        #0369a1 8px
+      );
+    }
+    .retro-gold-btn {
+      background: linear-gradient(180deg, #fde047 0%, #eab308 55%, #ca8a04 100%);
+      border: 3px solid #fef9c3;
+      box-shadow: 0 5px 0 #713f12, 0 8px 20px rgba(0, 0, 0, 0.75);
+      color: #0f172a;
+      text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.6);
+      transition: transform 0.06s ease, box-shadow 0.06s ease, filter 0.1s ease;
+    }
+    .retro-gold-btn:hover {
+      filter: brightness(1.08);
+    }
+    .retro-gold-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #713f12, 0 3px 6px rgba(0, 0, 0, 0.75);
+    }
+    .touch-btn {
+      background: rgba(15, 23, 42, 0.82);
+      border: 2px solid #94a3b8;
+      box-shadow: 0 3px 0 #020617;
+      color: #f8fafc;
+      touch-action: manipulation;
+    }
+    .touch-btn:active {
+      background: #facc15;
+      color: #0f172a;
+      border-color: #fef08a;
+      transform: translateY(2px);
+    }
+
+    /* Embedded utility layer: no Tailwind runtime, web fonts, images or network assets. */
+    .absolute{position:absolute}.relative{position:relative}.inset-0{inset:0}.top-14{top:3.5rem}
+    .left-1\/2{left:50%}.left-3{left:.75rem}.right-3{right:.75rem}.bottom-3{bottom:.75rem}
+    .-translate-x-1\/2{transform:translateX(-50%)}
+    .z-10{z-index:10}.z-20{z-index:20}.z-30{z-index:30}
+    .flex{display:flex}.inline-block{display:inline-block}.grid{display:grid}.hidden{display:none}
+    .flex-1{flex:1 1 0%}.flex-col{flex-direction:column}.items-center{align-items:center}
+    .items-end{align-items:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}
+    .grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}
+    .gap-1\.5{gap:.375rem}.gap-2{gap:.5rem}.gap-2\.5{gap:.625rem}
+    .space-y-2\.5>*+*{margin-top:.625rem}
+    .w-full{width:100%}.w-12{width:3rem}.w-3{width:.75rem}
+    .h-full{height:100%}.h-12{height:3rem}.h-3{height:.75rem}
+    .max-w-5xl{max-width:64rem}.max-w-xl{max-width:36rem}.max-w-md{max-width:28rem}
+    .max-h-\[780px\]{max-height:780px}.overflow-hidden{overflow:hidden}
+    .shrink-0{flex-shrink:0}.pointer-events-none{pointer-events:none}.pointer-events-auto{pointer-events:auto}
+    .cursor-pointer{cursor:pointer}.whitespace-nowrap{white-space:nowrap}
+    .p-3\.5{padding:.875rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}
+    .px-1\.5{padding-left:.375rem;padding-right:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}
+    .px-2\.5{padding-left:.625rem;padding-right:.625rem}.px-3{padding-left:.75rem;padding-right:.75rem}
+    .px-4{padding-left:1rem;padding-right:1rem}
+    .py-1{padding-top:.25rem;padding-bottom:.25rem}.py-1\.5{padding-top:.375rem;padding-bottom:.375rem}
+    .py-2{padding-top:.5rem;padding-bottom:.5rem}.py-3\.5{padding-top:.875rem;padding-bottom:.875rem}
+    .mb-2{margin-bottom:.5rem}.mb-3{margin-bottom:.75rem}.mb-5{margin-bottom:1.25rem}
+    .text-left{text-align:left}.text-center{text-align:center}.font-bold{font-weight:700}
+    .leading-relaxed{line-height:1.625}.uppercase{text-transform:uppercase}
+    .tracking-wide{letter-spacing:.025em}.tracking-wider{letter-spacing:.05em}.tracking-widest{letter-spacing:.1em}
+    .text-\[8px\]{font-size:8px}.text-\[9px\]{font-size:9px}.text-\[10px\]{font-size:10px}
+    .text-xs{font-size:.75rem}.text-sm{font-size:.875rem}.text-xl{font-size:1.25rem}.text-2xl{font-size:1.5rem}
+    .text-white{color:#fff}.text-yellow-300{color:#fde047}.text-yellow-400{color:#facc15}
+    .text-emerald-300{color:#6ee7b7}.text-emerald-400{color:#34d399}.text-amber-300{color:#fcd34d}
+    .text-rose-300{color:#fda4af}.text-rose-400{color:#fb7185}.text-sky-400{color:#38bdf8}
+    .text-slate-200{color:#e2e8f0}.text-slate-300{color:#cbd5e1}.text-slate-400{color:#94a3b8}
+    .bg-slate-800{background-color:#1e293b}.bg-slate-900{background-color:#0f172a}
+    .bg-slate-900\/95{background-color:rgba(15,23,42,.95)}.bg-slate-950{background-color:#020617}
+    .bg-slate-950\/90{background-color:rgba(2,6,23,.9)}.bg-slate-950\/92{background-color:rgba(2,6,23,.92)}
+    .bg-sky-500{background-color:#0ea5e9}.bg-yellow-400{background-color:#facc15}
+    .bg-emerald-600{background-color:#059669}
+    .border{border-width:1px;border-style:solid}.border-2{border:2px solid}.border-4{border:4px solid}
+    .border-b-2{border-bottom:2px solid}.border-black{border-color:#000}.border-slate-600{border-color:#475569}
+    .border-slate-700{border-color:#334155}.border-yellow-400{border-color:#facc15}
+    .rounded{border-radius:.25rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:.5rem}.rounded-xl{border-radius:.75rem}
+    .shadow{box-shadow:0 1px 3px rgba(0,0,0,.3)}.shadow-xl{box-shadow:0 10px 20px rgba(0,0,0,.35)}
+    .shadow-2xl{box-shadow:0 20px 30px rgba(0,0,0,.45)}
+    .opacity-0{opacity:0}.opacity-100{opacity:1}.transition-opacity{transition:opacity .2s}
+    .duration-200{transition-duration:200ms}.drop-shadow-\[0_3px_0_\#991b1b\]{filter:drop-shadow(0 3px 0 #991b1b)}
+    .drop-shadow-\[0_4px_0_\#b91c1c\]{filter:drop-shadow(0 4px 0 #b91c1c)}
+    .sega-cyan-bg{background:repeating-linear-gradient(0deg,#0284c7,#0284c7 4px,#0369a1 4px,#0369a1 8px)}
+    .hover\:bg-slate-700:hover{background:#334155}
+    @media(min-width:640px){
+      .sm\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .sm\:inline{display:inline}.sm\:p-7{padding:1.75rem}.sm\:px-4{padding-left:1rem;padding-right:1rem}
+      .sm\:py-4{padding-top:1rem;padding-bottom:1rem}.sm\:text-3xl{font-size:1.875rem}
+      .sm\:text-4xl{font-size:2.25rem}.sm\:text-\[10px\]{font-size:10px}.sm\:text-\[11px\]{font-size:11px}
+      .sm\:text-sm{font-size:.875rem}.sm\:text-xs{font-size:.75rem}
+    }
+    @media(min-width:768px){.md\:hidden{display:none}}
+
+  </style>
+</head>
+<body>
+
+  <!-- Arcade Frame -->
+  <div id="arcade-frame" class="relative w-full h-full max-w-5xl max-h-[780px] bg-slate-950 border-4 border-slate-700 rounded-xl overflow-hidden shadow-[0_0_50px_rgba(2,132,199,0.35)] flex flex-col">
+
+    <!-- Top Bar Header -->
+    <header class="bg-slate-900 border-b-2 border-slate-700 px-3 sm:px-4 py-2 flex items-center justify-between text-[9px] sm:text-xs z-30 shrink-0">
+      <div class="flex items-center gap-2.5">
+        <span class="inline-block w-3 h-3 rounded-full bg-yellow-400 border-2 border-black shadow"></span>
+        <span class="text-yellow-400 tracking-wider">AUTO RASH '91</span>
+        <span class="hidden sm:inline text-slate-400">| JUNCTION RUSH</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="toggle-bgm" type="button" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-[9px] text-emerald-400 cursor-pointer">
+          BGM: ON
+        </button>
+        <button id="toggle-sfx" type="button" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-[9px] text-amber-300 cursor-pointer">
+          SFX: ON
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Viewport -->
+    <main id="viewport" class="relative flex-1 w-full overflow-hidden bg-sky-500">
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- CRT Scanline Layer -->
+      <div class="crt-scanlines absolute inset-0 z-10"></div>
+
+      <!-- Floating Arcade Callout Banner -->
+      <div id="callout-banner" class="pointer-events-none absolute top-14 left-1/2 -translate-x-1/2 z-20 transition-opacity duration-200 opacity-0">
+        <div id="callout-text" class="bg-slate-950/90 border-2 border-yellow-400 text-yellow-300 px-4 py-1.5 rounded text-[10px] sm:text-xs shadow-xl whitespace-nowrap">
+          PA-PAAM! MOVE ASIDE!
+        </div>
+      </div>
+
+      <!-- 1. TITLE SCREEN OVERLAY -->
+      <section id="title-screen" class="absolute inset-0 z-30 sega-cyan-bg flex flex-col items-center justify-center p-4 text-center">
+        <div class="max-w-xl w-full bg-slate-900/95 border-4 border-yellow-400 rounded-xl p-5 sm:p-7 shadow-[0_12px_35px_rgba(0,0,0,0.85)]">
+          <div class="text-[9px] sm:text-[10px] text-emerald-400 mb-2 tracking-widest uppercase">
+            SEGA GENESIS 16-BIT TRIBUTE
+          </div>
+          <h1 class="text-2xl sm:text-4xl text-yellow-400 drop-shadow-[0_4px_0_#b91c1c] mb-3 tracking-wide">
+            AUTO RASH '91
+          </h1>
+          <p class="text-[9px] sm:text-[11px] text-slate-200 mb-5 leading-relaxed">
+            Hail your passenger in T. Nagar, weave through chaotic Chennai traffic, punch &amp; kick rival commuter bikes &amp; autos, and reach the junction 1st!
+          </p>
+
+          <!-- Controls Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-left bg-slate-950 border-2 border-slate-700 rounded-lg p-3.5 mb-5 text-[9px] sm:text-[10px]">
+            <div class="flex items-center gap-2">
+              <span class="bg-slate-800 border border-slate-600 px-1.5 py-1 rounded text-yellow-300 shrink-0">W / ▲</span>
+              <span class="text-slate-200">Throttle Auto</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="bg-slate-800 border border-slate-600 px-1.5 py-1 rounded text-yellow-300 shrink-0">S / ▼</span>
+              <span class="text-slate-200">Brake / Slow</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="bg-slate-800 border border-slate-600 px-1.5 py-1 rounded text-yellow-300 shrink-0">A D / ◄ ►</span>
+              <span class="text-slate-200">Steer / Lean</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="bg-slate-800 border border-slate-600 px-1.5 py-1 rounded text-rose-400 shrink-0">Z / SPC</span>
+              <span class="text-slate-200">Punch / Auto-target</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="bg-slate-800 border border-slate-600 px-1.5 py-1 rounded text-rose-400 shrink-0">X</span>
+              <span class="text-slate-200">Kick Left</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="bg-slate-800 border border-slate-600 px-1.5 py-1 rounded text-emerald-400 shrink-0">H</span>
+              <span class="text-slate-200">Horn ("Pa-Paam!")</span>
+            </div>
+          </div>
+
+          <button id="btn-start-game" type="button" class="retro-gold-btn w-full py-3.5 sm:py-4 rounded-lg text-xs sm:text-sm font-bold cursor-pointer tracking-wider">
+            HAIL PASSENGER &amp; START
+          </button>
+        </div>
+      </section>
+
+      <!-- 2. END / RESULTS SCREEN OVERLAY -->
+      <section id="end-screen" class="hidden absolute inset-0 z-30 bg-slate-950/92 flex flex-col items-center justify-center p-4 text-center">
+        <div class="max-w-md w-full bg-slate-900 border-4 border-yellow-400 rounded-xl p-6 shadow-2xl">
+          <div id="end-badge" class="inline-block px-3 py-1 rounded bg-emerald-600 text-white text-[9px] sm:text-[10px] mb-3">
+            T. NAGAR JUNCTION REACHED
+          </div>
+          <h2 id="end-title" class="text-xl sm:text-3xl text-yellow-400 drop-shadow-[0_3px_0_#991b1b] mb-3">
+            1ST PLACE!
+          </h2>
+          <p id="end-desc" class="text-[10px] text-slate-300 mb-5 leading-relaxed">
+            Your passenger arrived safely ahead of every rival in Chennai!
+          </p>
+
+          <div class="bg-slate-950 border-2 border-slate-700 rounded-lg p-4 mb-5 space-y-2.5 text-[10px]">
+            <div class="flex justify-between">
+              <span class="text-slate-400">FINAL RANK:</span>
+              <span id="res-rank" class="text-yellow-300">1st / 8</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">RACE TIME:</span>
+              <span id="res-time" class="text-emerald-400">00:48</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">RIVALS KNOCKED OUT:</span>
+              <span id="res-kos" class="text-rose-400">4</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">AUTO CONDITION:</span>
+              <span id="res-hp" class="text-sky-400">92%</span>
+            </div>
+          </div>
+
+          <button id="btn-play-again" type="button" class="retro-gold-btn w-full py-3.5 rounded-lg text-xs sm:text-sm font-bold cursor-pointer">
+            PLAY AGAIN
+          </button>
+        </div>
+      </section>
+
+      <!-- Touch Controls for Mobile/Tablet -->
+      <div id="mobile-controls" class="md:hidden absolute bottom-3 left-3 right-3 z-20 flex justify-between items-end pointer-events-none">
+        <div class="flex gap-2 pointer-events-auto">
+          <button id="m-left" type="button" class="touch-btn w-12 h-12 rounded-lg flex items-center justify-center text-sm">◄</button>
+          <button id="m-right" type="button" class="touch-btn w-12 h-12 rounded-lg flex items-center justify-center text-sm">►</button>
+        </div>
+        <div class="flex gap-1.5 pointer-events-auto">
+          <button id="m-horn" type="button" class="touch-btn px-2.5 h-12 rounded-lg flex items-center justify-center text-[8px] text-emerald-300">HRN</button>
+          <button id="m-kick" type="button" class="touch-btn px-2.5 h-12 rounded-lg flex items-center justify-center text-[8px] text-rose-300">KCK</button>
+          <button id="m-punch" type="button" class="touch-btn px-2.5 h-12 rounded-lg flex items-center justify-center text-[8px] text-yellow-300">PNC</button>
+          <button id="m-brake" type="button" class="touch-btn px-2 h-12 rounded-lg flex items-center justify-center text-[8px] text-amber-300">BRK</button>
+          <button id="m-gas" type="button" class="touch-btn px-2.5 h-12 rounded-lg flex items-center justify-center text-[8px] text-yellow-300">GAS</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  // =========================================================================
+  // 1. WEB AUDIO API 16-BIT SYNTHESIZER (Engine, Horn, Combat & Sega Bassline)
+  // =========================================================================
+  class SoundSystem {
+    constructor() {
+      this.ctx = null;
+      this.bgmOn = true;
+      this.sfxOn = true;
+      this.engineOsc = null;
+      this.engineGain = null;
+      this.bgmTimer = null;
+      this.step = 0;
+    }
+
+    init() {
+      if (!this.ctx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          this.ctx = new AudioContextClass();
+        }
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+      this.setupEngine();
+      this.startBgm();
+    }
+
+    setupEngine() {
+      if (!this.ctx || this.engineOsc) return;
+      this.engineOsc = this.ctx.createOscillator();
+      const filter = this.ctx.createBiquadFilter();
+      this.engineGain = this.ctx.createGain();
+
+      this.engineOsc.type = 'sawtooth';
+      this.engineOsc.frequency.value = 40;
+      filter.type = 'lowpass';
+      filter.frequency.value = 175;
+      this.engineGain.gain.value = 0;
+
+      this.engineOsc.connect(filter);
+      filter.connect(this.engineGain);
+      this.engineGain.connect(this.ctx.destination);
+      this.engineOsc.start();
+    }
+
+    updateEngine(speedRatio, active) {
+      if (!this.ctx || !this.engineOsc || !this.engineGain) return;
+      if (!this.sfxOn || !active) {
+        this.engineGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.05);
+        return;
+      }
+      const putt = Math.sin(performance.now() * 0.065) * 3.5;
+      const freq = 38 + speedRatio * 82 + putt;
+      const vol = 0.035 + speedRatio * 0.05;
+      this.engineOsc.frequency.setTargetAtTime(freq, this.ctx.currentTime, 0.04);
+      this.engineGain.gain.setTargetAtTime(vol, this.ctx.currentTime, 0.04);
+    }
+
+    playHorn() {
+      if (!this.sfxOn || !this.ctx) return;
+      const now = this.ctx.currentTime;
+      // Classic Indian Auto-Rickshaw Double-Tone "Pa-Paam!"
+      [0, 0.15].forEach((delay, idx) => {
+        const dur = idx === 0 ? 0.1 : 0.25;
+        const o1 = this.ctx.createOscillator();
+        const o2 = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        o1.type = 'sawtooth';
+        o2.type = 'square';
+        o1.frequency.setValueAtTime(349.23, now + delay); // F4
+        o2.frequency.setValueAtTime(440.00, now + delay); // A4
+        g.gain.setValueAtTime(0.11, now + delay);
+        g.gain.exponentialRampToValueAtTime(0.001, now + delay + dur);
+        o1.connect(g);
+        o2.connect(g);
+        g.connect(this.ctx.destination);
+        o1.start(now + delay);
+        o2.start(now + delay);
+        o1.stop(now + delay + dur);
+        o2.stop(now + delay + dur);
+      });
+    }
+
+    playSwing() {
+      if (!this.sfxOn || !this.ctx) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(280, now);
+      osc.frequency.exponentialRampToValueAtTime(65, now + 0.11);
+      gain.gain.setValueAtTime(0.16, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.11);
+    }
+
+    playHit() {
+      if (!this.sfxOn || !this.ctx) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(145, now);
+      osc.frequency.exponentialRampToValueAtTime(32, now + 0.18);
+      gain.gain.setValueAtTime(0.24, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.18);
+    }
+
+    playCrash() {
+      if (!this.sfxOn || !this.ctx) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(95, now);
+      osc.frequency.exponentialRampToValueAtTime(24, now + 0.35);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    }
+
+    startBgm() {
+      if (this.bgmTimer) return;
+      // 16-bit FM Synth Driving Bassline (Road Rash / OutRun Inspired)
+      const bassNotes = [110, 110, 130.81, 146.83, 110, 110, 164.81, 146.83, 98, 98, 110, 130.81, 146.83, 130.81, 110, 98];
+      this.bgmTimer = setInterval(() => {
+        if (!this.bgmOn || !this.ctx || this.ctx.state !== 'running') return;
+        const now = this.ctx.currentTime;
+        const freq = bassNotes[this.step % bassNotes.length];
+        this.step++;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.055, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.14);
+      }, 165);
+    }
+  }
+
+  const sound = new SoundSystem();
+
+  // =========================================================================
+  // 2. CANVAS, 16-BIT RENDER PIPELINE & GAME STATE
+  // =========================================================================
+  // 640x440 logical scene rendered into a 1.5x internal buffer, then
+  // nearest-neighbour scaled to the display for sharper Genesis-era pixels.
+  const canvas = document.getElementById('gameCanvas');
+  const screen = canvas.getContext('2d');
+
+  const W = 640;
+  const H = 440;
+  canvas.width = W;
+  canvas.height = H;
+  screen.imageSmoothingEnabled = false;
+
+  const BW = 480;
+  const BH = 330;
+  const buf = document.createElement('canvas');
+  buf.width = BW;
+  buf.height = BH;
+  const ctx = buf.getContext('2d', { willReadFrequently: true });
+
+  const HZ = H * 0.5; // horizon line (logical coords)
+
+  const STATE = {
+    TITLE: 'TITLE',
+    CUTSCENE: 'CUTSCENE',
+    RACING: 'RACING',
+    FINISHED: 'FINISHED'
+  };
+
+  let currentState = STATE.TITLE;
+  let cutsceneTime = 0;
+  let raceElapsed = 0;
+  let bgScroll = 0;
+
+  // Road & Track Constants
+  const SEGMENT_LENGTH = 200;
+  const ROAD_WIDTH = 2000;
+  const CAMERA_HEIGHT = 1050;
+  const CAMERA_DEPTH = 0.84;
+  const DRAW_DISTANCE = 160;
+  const TOTAL_SEGMENTS = 1400; // Equals 1000m race distance to T. Nagar Junction
+
+  let segments = [];
+  let segItems = [];
+  let racers = [];
+  let particles = [];
+  let hitPopups = [];
+  const playerDraw = { ax: W / 2, ay: H - 24, lean: 0 };
+  let hitStopTimer = 0;
+  let screenShake = 0;
+  let impactArcs = [];
+
+  // Player Auto State
+  const player = {
+    x: 0,           // Normalized road X (-1 to +1 on asphalt)
+    z: 0,           // World Z position along track
+    speed: 0,
+    maxSpeed: 13800,
+    health: 100,
+    steerLean: 0,
+    attackSide: null, // 'right' | 'left'
+    attackTimer: 0,
+    attackCooldown: 0,
+    hitFlash: 0,
+    hasHitThisSwing: false,
+    kos: 0
+  };
+
+  // Input State
+  const keys = {};
+  window.addEventListener('keydown', (e) => {
+    keys[e.code] = true;
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+      e.preventDefault();
+    }
+    if (currentState === STATE.RACING) {
+      if (e.code === 'KeyH') {
+        sound.playHorn();
+        showCallout('PA-PAAM! SIDE PLEASE!');
+      }
+      if (e.code === 'KeyZ' || e.code === 'Space') {
+        const side = keys['ArrowRight'] || keys['KeyD'] ? 'right'
+          : keys['ArrowLeft'] || keys['KeyA'] ? 'left' : null;
+        triggerCombat(side);
+      }
+      if (e.code === 'KeyX') {
+        triggerCombat('left');
+      }
+    }
+  });
+
+  window.addEventListener('keyup', (e) => {
+    keys[e.code] = false;
+  });
+
+  // =========================================================================
+  // 3. UI & BUTTON EVENT BINDINGS
+  // =========================================================================
+  const titleScreen = document.getElementById('title-screen');
+  const endScreen = document.getElementById('end-screen');
+  const calloutBanner = document.getElementById('callout-banner');
+  const calloutText = document.getElementById('callout-text');
+  let calloutTimeout = null;
+
+  function showCallout(msg) {
+    calloutText.textContent = msg;
+    calloutBanner.classList.remove('opacity-0');
+    calloutBanner.classList.add('opacity-100');
+    clearTimeout(calloutTimeout);
+    calloutTimeout = setTimeout(() => {
+      calloutBanner.classList.remove('opacity-100');
+      calloutBanner.classList.add('opacity-0');
+    }, 1500);
+  }
+
+  function startNewSession() {
+    sound.init();
+    titleScreen.classList.add('hidden');
+    endScreen.classList.add('hidden');
+
+    // Reset player
+    player.x = 0.35; // Parked near left curb for passenger boarding
+    player.z = 0;
+    player.speed = 0;
+    player.health = 100;
+    player.steerLean = 0;
+    player.attackSide = null;
+    player.attackTimer = 0;
+    player.attackCooldown = 0;
+    player.hitFlash = 0;
+    player.hasHitThisSwing = false;
+    player.kos = 0;
+    hitStopTimer = 0;
+    screenShake = 0;
+    impactArcs = [];
+
+    raceElapsed = 0;
+    cutsceneTime = 0;
+    bgScroll = 0;
+    particles = [];
+    hitPopups = [];
+
+    buildTrack();
+    spawnRacers();
+
+    currentState = STATE.CUTSCENE;
+    showCallout('T. NAGAR BUS STAND — PASSENGER BOARDING!');
+  }
+
+  document.getElementById('btn-start-game').addEventListener('click', startNewSession);
+  document.getElementById('btn-play-again').addEventListener('click', startNewSession);
+
+  // Audio toggles
+  const btnBgm = document.getElementById('toggle-bgm');
+  const btnSfx = document.getElementById('toggle-sfx');
+
+  btnBgm.addEventListener('click', () => {
+    sound.init();
+    sound.bgmOn = !sound.bgmOn;
+    btnBgm.textContent = sound.bgmOn ? 'BGM: ON' : 'BGM: OFF';
+    btnBgm.classList.toggle('text-emerald-400', sound.bgmOn);
+    btnBgm.classList.toggle('text-slate-500', !sound.bgmOn);
+  });
+
+  btnSfx.addEventListener('click', () => {
+    sound.init();
+    sound.sfxOn = !sound.sfxOn;
+    btnSfx.textContent = sound.sfxOn ? 'SFX: ON' : 'SFX: OFF';
+    btnSfx.classList.toggle('text-amber-300', sound.sfxOn);
+    btnSfx.classList.toggle('text-slate-500', !sound.sfxOn);
+  });
+
+  // Mobile Touch Controls
+  function bindTouch(id, code, actionFn) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (code) keys[code] = true;
+      if (actionFn) actionFn();
+    });
+    el.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      if (code) keys[code] = false;
+    });
+  }
+  bindTouch('m-left', 'ArrowLeft');
+  bindTouch('m-right', 'ArrowRight');
+  bindTouch('m-gas', 'ArrowUp');
+  bindTouch('m-brake', 'ArrowDown');
+  bindTouch('m-punch', null, () => currentState === STATE.RACING && triggerCombat('right'));
+  bindTouch('m-kick', null, () => currentState === STATE.RACING && triggerCombat('left'));
+  bindTouch('m-horn', null, () => {
+    if (currentState === STATE.RACING) {
+      sound.playHorn();
+      showCallout('PA-PAAM! SIDE PLEASE!');
+    }
+  });
+
+  // =========================================================================
+  // 4. TRACK GENERATION & CHENNAI URBAN SCENERY
+  // =========================================================================
+  const SHOP_SIGNS = [
+    { name: 'SRI SILKS & SAREES', bg: '#991b1b', fg: '#fef08a' },
+    { name: 'FILTER COFFEE KADAI', bg: '#065f46', fg: '#fde047' },
+    { name: 'AMMA TEA STALL', bg: '#92400e', fg: '#ffffff' },
+    { name: 'SARAVANA TIFFIN', bg: '#1e3a8a', fg: '#facc15' },
+    { name: 'T. NAGAR JEWELS', bg: '#701a75', fg: '#fef08a' }
+  ];
+
+  const BILLBOARDS = [
+    { name: 'FILTER KAAPI', bg: '#7c2d12', fg: '#fde68a' },
+    { name: 'IDLI DOSA', bg: '#14532d', fg: '#fef9c3' },
+    { name: 'AUTO RASH!', bg: '#1e1b4b', fg: '#facc15' },
+    { name: 'KOLLYWOOD', bg: '#831843', fg: '#fde047' }
+  ];
+
+  function addItem(i, item) {
+    item.segment = i;
+    segItems[i].push(item);
+  }
+
+  function buildTrack() {
+    segments = [];
+    segItems = [];
+
+    for (let i = 0; i < TOTAL_SEGMENTS; i++) {
+      segItems.push([]);
+
+      // Smooth OutRun/Road Rash S-Curves and gentle Chennai flyover hills
+      let curve = 0;
+      if (i > 60 && i < 260) curve = 1.6;
+      else if (i > 320 && i < 520) curve = -2.1;
+      else if (i > 600 && i < 820) curve = 2.4;
+      else if (i > 900 && i < 1150) curve = -1.8;
+
+      let y = Math.sin(i * 0.025) * 450;
+      if (i > 450 && i < 650) {
+        y += Math.sin(((i - 450) / 200) * Math.PI) * 1800; // Overbridge incline
+      }
+
+      segments.push({
+        index: i,
+        p1: { world: { y: y, z: i * SEGMENT_LENGTH }, camera: {}, screen: {} },
+        p2: { world: { y: y, z: (i + 1) * SEGMENT_LENGTH }, camera: {}, screen: {} },
+        curve: curve,
+        color: Math.floor(i / 4) % 2 === 0 ? 'dark' : 'light'
+      });
+
+      // Roadside South Indian props (Shops, Palm Trees, Power Poles, Saree Pedestrians)
+      if (i % 6 === 0) {
+        const side = (i % 12 === 0) ? -1 : 1;
+        const shop = SHOP_SIGNS[(i / 6) % SHOP_SIGNS.length | 0];
+        addItem(i, { offset: side * 1.48, type: 'shop', shop: shop });
+      }
+      if (i % 9 === 3) {
+        addItem(i, {
+          offset: -1.25,
+          type: 'pedestrian',
+          sareeColor: i % 18 === 3 ? '#ec4899' : '#10b981'
+        });
+        addItem(i, { offset: 1.25, type: 'palm' });
+      }
+      if (i % 10 === 0) {
+        addItem(i, { offset: -1.16, type: 'pole' });
+        addItem(i, { offset: 1.16, type: 'pole' });
+      }
+      // Big roadside hoardings (Road Rash style billboards)
+      if (i % 47 === 5) {
+        const k = Math.floor(i / 47);
+        addItem(i, {
+          offset: (k % 2 ? -1 : 1) * 2.0,
+          type: 'billboard',
+          ad: BILLBOARDS[k % BILLBOARDS.length]
+        });
+      }
+    }
+  }
+
+  function spawnRacers() {
+    racers = [];
+    const roster = [
+      { name: 'Selvam', type: 'auto', color: '#facc15', shirt: '#ffffff', tie: '#dc2626' },
+      { name: 'Karthik', type: 'bike', color: '#dc2626', shirt: '#f8fafc', tie: '#1d4ed8' },
+      { name: 'Murugan', type: 'auto', color: '#eab308', shirt: '#38bdf8', tie: '#0f172a' },
+      { name: 'Anand', type: 'bike', color: '#16a34a', shirt: '#ffffff', tie: '#0f172a' },
+      { name: 'Bala', type: 'bike', color: '#2563eb', shirt: '#fef08a', tie: '#991b1b' },
+      { name: 'Senthil', type: 'auto', color: '#f59e0b', shirt: '#e2e8f0', tie: '#047857' },
+      { name: 'Dinesh', type: 'bike', color: '#9333ea', shirt: '#ffffff', tie: '#b91c1c' },
+      { name: 'Prakash', type: 'auto', color: '#0ea5e9', shirt: '#fef3c7', tie: '#be123c' }
+    ];
+
+    roster.forEach((info, idx) => {
+      racers.push({
+        ...info,
+        x: [-0.68, 0.12, 0.70, -0.35, 0.43, 0.02, -0.72, 0.68][idx] + (Math.random() - 0.5) * 0.08,
+        z: (18 + idx * 27 + Math.random() * 8) * SEGMENT_LENGTH,
+        speed: 9000 + idx * 330,
+        maxSpeed: 11200 + idx * 380,
+        health: 100,
+        knockedDown: false,
+        downTimer: 0,
+        wobble: 0,
+        spin: 0,
+        flashFrames: 0,
+        collisionCooldown: 0,
+        aiLane: [-0.72, -0.24, 0.24, 0.72][idx % 4],
+        aiAttackCooldown: 1.5 + Math.random() * 2
+      });
+    });
+  }
+
+  // =========================================================================
+  // 5. COMBAT & PHYSICS MECHANICS
+  // =========================================================================
+  function triggerCombat(side) {
+    if (player.attackCooldown > 0) return;
+    // A neutral strike auto-selects the closest rival on either flank.
+    if (!side) {
+      let best = null, bestScore = Infinity;
+      racers.forEach((r) => {
+        if (r.knockedDown) return;
+        const dz = r.z - player.z, dx = r.x - player.x;
+        if (Math.abs(dz) <= 1050 && Math.abs(dx) > 0.08 && Math.abs(dx) < 0.92) {
+          const score = Math.abs(dz) * 0.001 + Math.abs(dx) * 0.8;
+          if (score < bestScore) { bestScore = score; best = dx > 0 ? 'right' : 'left'; }
+        }
+      });
+      side = best || (player.x < 0 ? 'right' : 'left');
+    }
+    player.attackSide = side;
+    player.attackTimer = 0.30;
+    player.attackCooldown = 0.42;
+    player.hasHitThisSwing = false;
+    sound.playSwing();
+  }
+
+  function registerMeleeHit(r, side) {
+    if (player.hasHitThisSwing || r.knockedDown) return;
+    const dmg = side === 'left' ? 50 : 38;
+    r.health -= dmg;
+    r.wobble = side === 'right' ? 1.0 : -1.0;
+    r.spin = side === 'right' ? 0.34 : -0.34;
+    r.x += side === 'right' ? 0.34 : -0.34;
+    r.speed *= 0.72;
+    r.flashFrames = 4;
+    player.hasHitThisSwing = true;
+    sound.playHit();
+    hitStopTimer = 0.055;
+    screenShake = 7;
+    const hitX = playerDraw.ax + (side === 'right' ? 88 : -88);
+    const hitY = H - 150;
+    impactArcs.push({ x: hitX, y: hitY, side, life: 0.22 });
+    for (let i = 0; i < 15; i++) {
+      const a = Math.random() * Math.PI * 2, v = 35 + Math.random() * 150;
+      particles.push({ x: hitX, y: hitY, vx: Math.cos(a) * v, vy: Math.sin(a) * v,
+        life: 0.24 + Math.random() * 0.18, color: i % 3 ? '#fff7cc' : '#fbbf24', size: 3 + Math.random() * 3 });
+    }
+    hitPopups.push({ text: r.health <= 0 ? 'K.O.!!' : (side === 'left' ? 'WHAM!' : 'POW!'),
+      x: hitX, y: hitY - 12, life: 0.75, color: r.health <= 0 ? '#ef4444' : '#facc15' });
+    if (r.health <= 0) {
+      r.knockedDown = true;
+      r.downTimer = 3.6;
+      r.speed = 0;
+      r.spin = side === 'right' ? 1.35 : -1.35;
+      player.kos++;
+      showCallout(`KNOCKED DOWN ${r.name.toUpperCase()}!`);
+    }
+  }
+
+  function checkMeleeHits() {
+    if (!player.attackSide || player.attackTimer <= 0.035 || player.attackTimer >= 0.275 || player.hasHitThisSwing) return;
+    const side = player.attackSide;
+    // These are world-space lateral units; the reach follows the active limb.
+    const reach = side === 'left' ? 0.98 : 0.92;
+    racers.slice().sort((a, b) => Math.abs(a.z - player.z) - Math.abs(b.z - player.z)).some((r) => {
+      if (r.knockedDown) return false;
+      const dz = r.z - player.z;
+      const dx = r.x - player.x;
+      const inDepth = dz > -760 && dz < 1120;
+      const inSide = side === 'right' ? dx > 0.035 && dx < reach : dx < -0.035 && dx > -reach;
+      if (inDepth && inSide) { registerMeleeHit(r, side); return true; }
+      return false;
+    });
+  }
+
+  function update(dt) {
+    // Update floating comic popups
+    for (let i = hitPopups.length - 1; i >= 0; i--) {
+      hitPopups[i].y -= 42 * dt;
+      hitPopups[i].life -= dt;
+      if (hitPopups[i].life <= 0) hitPopups.splice(i, 1);
+    }
+
+    if (hitStopTimer > 0) {
+      hitStopTimer = Math.max(0, hitStopTimer - dt);
+      return;
+    }
+
+    // 1. CUTSCENE STATE: Passenger in pink/gold saree boards the auto
+    if (currentState === STATE.CUTSCENE) {
+      cutsceneTime += dt;
+      sound.updateEngine(0.08, true);
+
+      if (cutsceneTime >= 3.2) {
+        currentState = STATE.RACING;
+        sound.playHorn();
+        showCallout('GO! REACH T. NAGAR JUNCTION 1ST!');
+      }
+      return;
+    }
+
+    if (currentState !== STATE.RACING) {
+      sound.updateEngine(0, false);
+      return;
+    }
+
+    raceElapsed += dt;
+
+    // 2. PLAYER ACCELERATION, BRAKING & STEERING
+    const accelInput = keys['KeyW'] || keys['ArrowUp'];
+    const brakeInput = keys['KeyS'] || keys['ArrowDown'];
+    const leftInput = keys['KeyA'] || keys['ArrowLeft'];
+    const rightInput = keys['KeyD'] || keys['ArrowRight'];
+
+    if (accelInput) {
+      player.speed += 6800 * dt;
+    } else if (brakeInput) {
+      player.speed -= 11500 * dt;
+    } else {
+      player.speed -= 3200 * dt;
+    }
+
+    // Off-road curb slowdown
+    if (Math.abs(player.x) > 1.05) {
+      player.speed -= 5500 * dt;
+      if (player.speed > 4000 && Math.random() < 0.35) {
+        particles.push({
+          x: W / 2 + (Math.random() - 0.5) * 90,
+          y: H - 35,
+          vx: (Math.random() - 0.5) * 60,
+          vy: -30 - Math.random() * 40,
+          life: 0.4,
+          color: '#d97706',
+          size: 5
+        });
+      }
+    }
+
+    player.speed = Math.max(0, Math.min(player.maxSpeed, player.speed));
+    const speedRatio = player.speed / player.maxSpeed;
+    sound.updateEngine(speedRatio, true);
+
+    // Short-lived dark skid flecks under hard braking and aggressive steering.
+    if ((brakeInput || Math.abs(player.steerLean) > 0.72) && player.speed > 2200 && Math.random() < 0.42) {
+      particles.push({
+        x: playerDraw.ax + (Math.random() - 0.5) * 82,
+        y: H - 22 + Math.random() * 5,
+        vx: (Math.random() - 0.5) * 16,
+        vy: -2 - Math.random() * 8,
+        life: 0.28,
+        color: '#25202a',
+        size: 3 + Math.random() * 3
+      });
+    }
+
+    // Exhaust puffs from the auto's tailpipe
+    if (accelInput && player.speed > 300 && Math.random() < 0.3) {
+      particles.push({
+        x: playerDraw.ax + 52,
+        y: H - 36,
+        vx: 18 + Math.random() * 26,
+        vy: -14 - Math.random() * 22,
+        life: 0.45,
+        color: 'rgba(210,210,220,0.65)',
+        size: 6
+      });
+    }
+
+    // Steering & Centrifugal Curve Pull
+    const currentSeg = segments[Math.floor(player.z / SEGMENT_LENGTH) % segments.length];
+    const steerPower = 1.65 * (0.25 + speedRatio * 0.75);
+
+    if (leftInput) {
+      player.x -= steerPower * dt;
+      player.steerLean = Math.max(-1, player.steerLean - 7 * dt);
+    } else if (rightInput) {
+      player.x += steerPower * dt;
+      player.steerLean = Math.min(1, player.steerLean + 7 * dt);
+    } else {
+      player.steerLean *= 0.85;
+    }
+
+    // Centrifugal force on curves
+    if (currentSeg) {
+      player.x -= currentSeg.curve * speedRatio * 0.42 * dt;
+      bgScroll -= currentSeg.curve * speedRatio * 70 * dt; // backdrop sweeps through bends
+    }
+    player.x = Math.max(-1.45, Math.min(1.45, player.x));
+
+    // Advance Z position
+    player.z += player.speed * dt;
+
+    // Combat timers
+    if (player.attackTimer > 0) {
+      player.attackTimer -= dt;
+      if (player.attackTimer <= 0) {
+        player.attackSide = null;
+        player.hasHitThisSwing = false;
+      }
+    }
+    checkMeleeHits();
+    if (player.attackCooldown > 0) player.attackCooldown -= dt;
+    if (player.hitFlash > 0) player.hitFlash -= dt;
+
+    // 3. RIVAL AI & COLLISIONS
+    racers.forEach((r) => {
+      if (r.knockedDown) {
+        r.downTimer -= dt;
+        r.spin *= 0.985;
+        r.wobble = Math.sin(r.downTimer * 18) * 0.35;
+        if (r.downTimer <= 0) {
+          r.knockedDown = false;
+          r.health = 100;
+          r.speed = r.maxSpeed * 0.7;
+          r.spin = 0;
+          r.wobble = 0;
+        }
+        return;
+      }
+
+      // Rubber-banding AI speed so pack stays competitive
+      const distGap = player.z - r.z;
+      let targetSpd = r.maxSpeed;
+      if (distGap > 3500) targetSpd = r.maxSpeed * 1.18;
+      else if (distGap < -4500) targetSpd = r.maxSpeed * 0.86;
+
+      r.speed += (targetSpd - r.speed) * 1.8 * dt;
+      r.z += r.speed * dt;
+
+      // Independent lane targets and imperfect weaving create a lively pack.
+      r.wobble *= 0.90;
+      r.spin *= 0.94;
+      r.x += (r.aiLane - r.x) * 0.22 * dt
+        + Math.sin(raceElapsed * (1.35 + (r.maxSpeed % 5) * 0.08) + r.z * 0.00045) * 0.20 * dt
+        + r.wobble * dt;
+      r.x = Math.max(-0.91, Math.min(0.91, r.x));
+      if (r.flashFrames > 0) r.flashFrames--;
+      if (r.collisionCooldown > 0) r.collisionCooldown -= dt;
+
+      // Vehicle footprints overlap only when both lateral and longitudinal
+      // separation are inside the projected body dimensions.
+      const dz = Math.abs(r.z - player.z);
+      const dx = Math.abs(r.x - player.x);
+      const lateralFootprint = r.type === 'auto' ? 0.34 : 0.23;
+      const depthFootprint = r.type === 'auto' ? 300 : 235;
+      if (dz < depthFootprint && dx < lateralFootprint && r.collisionCooldown <= 0) {
+        r.collisionCooldown = 0.42;
+        sound.playCrash();
+        player.speed *= 0.76;
+        r.speed *= 0.88;
+        player.health = Math.max(0, player.health - 6);
+        player.hitFlash = 0.25;
+        const pushDir = player.x <= r.x ? -1 : 1;
+        player.x += pushDir * 0.17;
+        r.x -= pushDir * 0.19;
+        r.wobble += pushDir * 0.55;
+        screenShake = Math.max(screenShake, 3);
+        if (player.health <= 0) finishRace(false);
+      }
+    });
+
+    screenShake = Math.max(0, screenShake - 24 * dt);
+    for (let i = impactArcs.length - 1; i >= 0; i--) {
+      impactArcs[i].life -= dt;
+      if (impactArcs[i].life <= 0) impactArcs.splice(i, 1);
+    }
+
+    // Update dust / exhaust particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      particles[i].x += particles[i].vx * dt;
+      particles[i].y += particles[i].vy * dt;
+      particles[i].life -= dt;
+      if (particles[i].life <= 0) particles.splice(i, 1);
+    }
+
+    // 4. CHECK FINISH LINE (T. NAGAR JUNCTION AT 1000m)
+    const maxTrackZ = (TOTAL_SEGMENTS - 20) * SEGMENT_LENGTH;
+    if (player.z >= maxTrackZ) {
+      finishRace(true);
+    }
+  }
+
+  function finishRace(completed) {
+    currentState = STATE.FINISHED;
+    sound.updateEngine(0, false);
+    sound.playHorn();
+
+    const rank = racers.filter((r) => r.z > player.z).length + 1;
+    const rankSuffix = rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`;
+    const mins = String(Math.floor(raceElapsed / 60)).padStart(2, '0');
+    const secs = String(Math.floor(raceElapsed % 60)).padStart(2, '0');
+
+    const badge = document.getElementById('end-badge');
+    const title = document.getElementById('end-title');
+    const desc = document.getElementById('end-desc');
+
+    if (!completed) {
+      badge.textContent = 'AUTO WRECKED!';
+      badge.className = 'inline-block px-3 py-1 rounded bg-rose-600 text-white text-[9px] sm:text-[10px] mb-3';
+      title.textContent = 'BREAKDOWN!';
+      desc.textContent = 'Your auto took too much damage in Chennai traffic before reaching T. Nagar Junction.';
+    } else if (rank === 1) {
+      badge.textContent = 'T. NAGAR JUNCTION REACHED';
+      badge.className = 'inline-block px-3 py-1 rounded bg-emerald-600 text-white text-[9px] sm:text-[10px] mb-3';
+      title.textContent = '1ST PLACE VICTORY!';
+      desc.textContent = 'King of Chennai streets! You beat every rival auto and bike to T. Nagar Junction!';
+    } else {
+      badge.textContent = 'T. NAGAR JUNCTION REACHED';
+      badge.className = 'inline-block px-3 py-1 rounded bg-amber-600 text-white text-[9px] sm:text-[10px] mb-3';
+      title.textContent = `${rankSuffix.toUpperCase()} PLACE!`;
+      desc.textContent = 'You delivered your passenger to T. Nagar Junction! Punch more rivals to claim 1st!';
+    }
+
+    document.getElementById('res-rank').textContent = `${rankSuffix} / 8`;
+    document.getElementById('res-time').textContent = `${mins}:${secs}`;
+    document.getElementById('res-kos').textContent = String(player.kos);
+    document.getElementById('res-hp').textContent = `${Math.round(player.health)}%`;
+
+    endScreen.classList.remove('hidden');
+  }
+
+  // =========================================================================
+  // 6. 16-BIT PIXEL DRAWING HELPERS
+  // =========================================================================
+  // Logical primitives snap to the 480x330 internal pixel grid.
+  const PIXEL_SCALE = BW / W;
+  const snap = (v) => Math.round(v * PIXEL_SCALE) / PIXEL_SCALE;
+
+  function B(x, y, w, h, c) {
+    const x0 = snap(x);
+    const y0 = snap(y);
+    let x1 = snap(x + w);
+    let y1 = snap(y + h);
+    if (x1 <= x0) x1 = x0 + 2;
+    if (y1 <= y0) y1 = y0 + 2;
+    ctx.fillStyle = c;
+    ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+  }
+
+  // Brighten (f > 1) or darken (f < 1) a #rrggbb colour
+  function shade(hex, f) {
+    const n = parseInt(hex.slice(1), 16);
+    let r = (n >> 16) & 255;
+    let g = (n >> 8) & 255;
+    let b = n & 255;
+    if (f < 1) {
+      r *= f; g *= f; b *= f;
+    } else {
+      const t = f - 1;
+      r += (255 - r) * t; g += (255 - g) * t; b += (255 - b) * t;
+    }
+    return `rgb(${r | 0},${g | 0},${b | 0})`;
+  }
+
+  // Sprite helper: draws chunky rects relative to a base point; "lean" skews
+  // the upper body sideways like the leaning riders in Road Rash.
+  function makeSprite(cx, cy, s, lean) {
+    const o = {};
+    o.r = (dx, dy, w, h, c) => {
+      const k = lean * (-(dy + h / 2)) * 0.22;
+      B(cx + (dx + k) * s, cy + dy * s, w * s, h * s, c);
+    };
+    o.disc = (dx, dy, rad, c) => {
+      for (let j = -rad; j <= rad; j += 2) {
+        const hw = Math.sqrt(Math.max(0, rad * rad - j * j));
+        o.r(dx - hw, dy + j - 1, hw * 2, 2, c);
+      }
+    };
+    return o;
+  }
+
+  function shadow(x, y, w, h, a) {
+    ctx.fillStyle = `rgba(0,0,0,${a})`;
+    ctx.beginPath();
+    ctx.ellipse(x, y, w, h, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Genesis-style 3-bit-per-channel palette crush with Bayer ordered dithering
+  const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+  function postProcess() {
+    const img = ctx.getImageData(0, 0, BW, BH);
+    const d = img.data;
+    const step = 255 / 7;
+    const amp = step * 0.55;
+    for (let y = 0; y < BH; y++) {
+      for (let x = 0; x < BW; x++) {
+        const i = (y * BW + x) * 4;
+        const t = (BAYER[((y & 3) << 2) | (x & 3)] / 15 - 0.5) * amp;
+        let v = d[i] + t;
+        d[i] = Math.round((v < 0 ? 0 : v > 255 ? 255 : v) / step) * step;
+        v = d[i + 1] + t;
+        d[i + 1] = Math.round((v < 0 ? 0 : v > 255 ? 255 : v) / step) * step;
+        v = d[i + 2] + t;
+        d[i + 2] = Math.round((v < 0 ? 0 : v > 255 ? 255 : v) / step) * step;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+
+  // =========================================================================
+  // 7. PSEUDO-3D PROJECTION & ROAD RENDERER
+  // =========================================================================
+  function project(p, cameraX, cameraY, cameraZ) {
+    p.camera.x = (p.world.x || 0) - cameraX;
+    p.camera.y = (p.world.y || 0) - cameraY;
+    p.camera.z = (p.world.z || 0) - cameraZ;
+    const z = Math.max(1, p.camera.z);
+    p.screen.scale = CAMERA_DEPTH / z;
+    p.screen.x = Math.round((W / 2) + (p.screen.scale * p.camera.x * W / 2));
+    p.screen.y = Math.round((H / 2) - (p.screen.scale * p.camera.y * H / 2));
+    p.screen.w = Math.round((p.screen.scale * ROAD_WIDTH * W / 2));
+  }
+
+  function drawQuad(x1, y1, w1, x2, y2, w2, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x1 - w1, y1);
+    ctx.lineTo(x2 - w2, y2);
+    ctx.lineTo(x2 + w2, y2);
+    ctx.lineTo(x1 + w1, y1);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // A quad centred at (offset * width) from the road centre line
+  function strip(seg, off, half, color) {
+    const a = seg.p1.screen;
+    const b = seg.p2.screen;
+    drawQuad(a.x + a.w * off, a.y, a.w * half, b.x + b.w * off, b.y, b.w * half, color);
+  }
+
+  function render() {
+    ctx.setTransform(PIXEL_SCALE, 0, 0, PIXEL_SCALE, 0, 0);
+    ctx.textAlign = 'left';
+
+    const baseIndex = Math.floor(player.z / SEGMENT_LENGTH);
+    const baseSegment = segments[baseIndex % segments.length] || segments[0];
+    const basePercent = (player.z % SEGMENT_LENGTH) / SEGMENT_LENGTH;
+    const playerY = baseSegment.p1.world.y + (baseSegment.p2.world.y - baseSegment.p1.world.y) * basePercent;
+
+    // 1. SKY, SUN, CLOUDS, MOUNTAINS, CITY & HILL LAYERS
+    drawBackdrop(bgScroll - player.x * 35);
+
+    // 2. PSEUDO-3D CURVED ROAD SEGMENTS
+    let x = 0;
+    let dx = -(baseSegment.curve * basePercent);
+    let maxY = H;
+    const visibleSprites = [];
+
+    for (let n = 0; n < DRAW_DISTANCE; n++) {
+      const segIdx = baseIndex + n;
+      if (segIdx >= segments.length) break;
+      const seg = segments[segIdx];
+
+      project(seg.p1, (player.x * ROAD_WIDTH) - x, playerY + CAMERA_HEIGHT, player.z);
+      project(seg.p2, (player.x * ROAD_WIDTH) - x - dx, playerY + CAMERA_HEIGHT, player.z);
+
+      x += dx;
+      dx += seg.curve;
+
+      if (seg.p1.camera.z <= CAMERA_DEPTH || seg.p2.screen.y >= maxY || seg.p2.screen.y >= seg.p1.screen.y) {
+        continue;
+      }
+
+      const isLight = seg.color === 'light';
+      const grassCol = isLight ? '#2f7d32' : '#296a2c';
+      const dirtCol = isLight ? '#b0663a' : '#99522d';
+      const sidewalkCol = isLight ? '#a8a29e' : '#8d877f';
+      const curbCol = isLight ? '#dc2626' : '#f8fafc';
+      const roadCol = isLight ? '#4d5262' : '#434859';
+
+      const s1 = seg.p1.screen;
+      const s2 = seg.p2.screen;
+
+      // Grass verge
+      ctx.fillStyle = grassCol;
+      ctx.fillRect(0, s2.y, W, s1.y - s2.y);
+
+      // Red-earth shoulder
+      drawQuad(s1.x, s1.y, s1.w * 1.9, s2.x, s2.y, s2.w * 1.9, dirtCol);
+
+      // Urban pavement strip
+      drawQuad(s1.x, s1.y, s1.w * 1.45, s2.x, s2.y, s2.w * 1.45, sidewalkCol);
+
+      // Beveled red/white curb blocks with a warm sunset-lit upper edge.
+      drawQuad(s1.x, s1.y, s1.w * 1.105, s2.x, s2.y, s2.w * 1.105, '#292333');
+      drawQuad(s1.x, s1.y, s1.w * 1.075, s2.x, s2.y, s2.w * 1.075, curbCol);
+      if (isLight) {
+        drawQuad(s1.x, s1.y, s1.w * 1.075, s2.x, s2.y, s2.w * 1.075, '#dc2626');
+      } else {
+        drawQuad(s1.x, s1.y, s1.w * 1.075, s2.x, s2.y, s2.w * 1.075, '#f8fafc');
+      }
+      drawQuad(s1.x, s1.y, s1.w * 1.055, s2.x, s2.y, s2.w * 1.055, '#d1a58a');
+
+      // Asphalt
+      drawQuad(s1.x, s1.y, s1.w, s2.x, s2.y, s2.w, roadCol);
+
+      // Sunset bounce: thin amber road sheen, strongest near the horizon.
+      const bounceAlpha = Math.max(0, 0.16 - n * 0.0008);
+      if (bounceAlpha > 0) strip(seg, 0, 0.58, `rgba(255,174,91,${bounceAlpha})`);
+
+      // Solid white edge lines
+      strip(seg, -0.92, 0.022, '#f1f5f9');
+      strip(seg, 0.92, 0.022, '#f1f5f9');
+
+      // Double solid yellow centre line (Road Rash style)
+      strip(seg, -0.032, 0.012, '#fbbf24');
+      strip(seg, 0.032, 0.012, '#fbbf24');
+
+      // Dashed white lane dividers
+      if (isLight) {
+        strip(seg, -0.5, 0.012, '#e2e8f0');
+        strip(seg, 0.5, 0.012, '#e2e8f0');
+      }
+
+      // Chequered finish line at T. Nagar Junction
+      if (segIdx >= TOTAL_SEGMENTS - 26 && segIdx <= TOTAL_SEGMENTS - 24) {
+        for (let k = 0; k < 8; k++) {
+          const off = -1 + (k + 0.5) * 0.25;
+          strip(seg, off, 0.125, ((k + segIdx) % 2) ? '#f8fafc' : '#0b0f1a');
+        }
+      }
+
+      // T. Nagar Junction Finish Banner Arch near end of track
+      if (segIdx === TOTAL_SEGMENTS - 25) {
+        visibleSprites.push({
+          z: seg.p1.camera.z,
+          screenX: s1.x,
+          screenY: s1.y,
+          scale: s1.scale * ROAD_WIDTH,
+          kind: 'junctionArch'
+        });
+      }
+
+      // Collect scenery props on this segment
+      const items = segItems[segIdx];
+      for (let s = 0; s < items.length; s++) {
+        const item = items[s];
+        visibleSprites.push({
+          z: seg.p1.camera.z,
+          screenX: s1.x + (s1.w * item.offset),
+          screenY: s1.y,
+          scale: s1.scale * ROAD_WIDTH,
+          kind: item.type,
+          data: item
+        });
+      }
+
+      // Collect rival racers on this segment
+      for (let r = 0; r < racers.length; r++) {
+        const racer = racers[r];
+        const rSeg = Math.floor(racer.z / SEGMENT_LENGTH);
+        if (rSeg === segIdx) {
+          visibleSprites.push({
+            z: seg.p1.camera.z,
+            screenX: s1.x + (s1.w * racer.x),
+            screenY: s1.y,
+            scale: s1.scale * ROAD_WIDTH,
+            kind: 'racer',
+            data: racer
+          });
+        }
+      }
+
+      maxY = s2.y;
+    }
+
+    // Distance haze where the road melts into the hills
+    const haze = ctx.createLinearGradient(0, HZ - 26, 0, HZ + 44);
+    haze.addColorStop(0, 'rgba(255,190,120,0)');
+    haze.addColorStop(0.45, 'rgba(255,190,120,0.5)');
+    haze.addColorStop(1, 'rgba(255,190,120,0)');
+    ctx.fillStyle = haze;
+    ctx.fillRect(0, HZ - 26, W, 70);
+
+    // Traffic that has slipped behind the player is still drawn: negative
+    // camera-space Z places it nearer than the player in the same painter queue.
+    racers.forEach((r) => {
+      const dz = r.z - player.z;
+      if (dz < 0 && dz > -3200) {
+        const near = Math.min(1, -dz / 3200);
+        visibleSprites.push({
+          z: dz,
+          screenX: W / 2 + (r.x - player.x) * 190,
+          screenY: H - 150 + near * 52,
+          scale: 0.78 + near * 0.28,
+          kind: 'racer',
+          data: r
+        });
+      }
+    });
+
+    // Player, traffic and roadside props share one strict far-to-near queue.
+    // Camera-space Z is used consistently: larger positive Z is farther away.
+    visibleSprites.push({ z: 0, kind: 'player', screenX: W / 2, screenY: H - 24, scale: 1 });
+    visibleSprites.sort((a, b) => b.z - a.z);
+    for (let i = 0; i < visibleSprites.length; i++) {
+      drawWorldSprite(visibleSprites[i]);
+    }
+
+    // 5. INTRO CUTSCENE: Saree Passenger Boarding Animation
+    if (currentState === STATE.CUTSCENE) {
+      drawCutscenePassenger();
+    }
+
+    // 6. Crush to 16-bit palette + dither, then blit with hard pixels
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    postProcess();
+    screen.imageSmoothingEnabled = false;
+    screen.save();
+    if (screenShake > 0) {
+      const q = screenShake * 0.45;
+      screen.translate((Math.random() - 0.5) * q, (Math.random() - 0.5) * q);
+    }
+    screen.drawImage(buf, 0, 0, W, H);
+    screen.restore();
+
+    // 7. Crisp overlay: particles, comic popups, speech, HUD
+    drawOverlay();
+  }
+
+  // =========================================================================
+  // 8. BACKDROP: SKY, SUN, CLOUDS, MOUNTAINS, CHENNAI SKYLINE, HILLS
+  // =========================================================================
+  const CLOUDS = [
+    { x: 60, y: 64, w: 96 },
+    { x: 300, y: 44, w: 124 },
+    { x: 520, y: 84, w: 84 },
+    { x: 190, y: 104, w: 70 }
+  ];
+
+  function ridge(baseY, a1, f1, a2, f2, shift, color, bottom) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(0, bottom);
+    for (let px = 0; px <= W; px += 4) {
+      const y = baseY - (a1 + a2) - Math.sin((px + shift) * f1) * a1 - Math.sin((px + shift) * f2 + 1.7) * a2;
+      ctx.lineTo(px, snap(y));
+    }
+    ctx.lineTo(W, bottom);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawGopuram(x, baseY, sc) {
+    // Dravidian temple tower silhouette, a Chennai landmark
+    for (let t = 0; t < 7; t++) {
+      const w = (64 - t * 8) * sc;
+      const h = 10 * sc;
+      B(x - w / 2, baseY - (t + 1) * h, w, h, t % 2 ? '#3d3566' : '#2c2552');
+      if (t < 6) {
+        for (let k = -1; k <= 1; k++) {
+          B(x + k * w * 0.28 - 2 * sc, baseY - (t + 1) * h + 3 * sc, 4 * sc, 4 * sc, '#f59e0b');
+        }
+      }
+    }
+    B(x - 3 * sc, baseY - 7 * 10 * sc - 8 * sc, 6 * sc, 8 * sc, '#2c2552');
+    B(x - 1 * sc, baseY - 7 * 10 * sc - 16 * sc, 2 * sc, 8 * sc, '#facc15');
+  }
+
+  function drawBackdrop(shift) {
+    // Golden hour sky (dithered into bands by the palette crush)
+    const sky = ctx.createLinearGradient(0, 0, 0, HZ);
+    sky.addColorStop(0, '#2c2368');
+    sky.addColorStop(0.3, '#8e3a7a');
+    sky.addColorStop(0.48, '#c94d66');
+    sky.addColorStop(0.62, '#ef6b36');
+    sky.addColorStop(0.82, '#ffb84d');
+    sky.addColorStop(1, '#fff0ad');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, HZ + 4);
+
+    // Setting sun with banded halo
+    const sx = W * 0.5 + shift * 0.08;
+    const sy = H * 0.37;
+    ctx.fillStyle = 'rgba(255, 225, 160, 0.20)';
+    ctx.beginPath(); ctx.arc(sx, sy, 78, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(255, 240, 170, 0.4)';
+    ctx.beginPath(); ctx.arc(sx, sy, 58, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fef08a';
+    ctx.beginPath(); ctx.arc(sx, sy, 42, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fffbd0';
+    ctx.beginPath(); ctx.arc(sx, sy, 30, 0, Math.PI * 2); ctx.fill();
+
+    // Pixel clouds
+    const span = W + 200;
+    const tNow = performance.now() * 0.004;
+    CLOUDS.forEach((c) => {
+      const cx = (((c.x + shift * 0.25 + tNow) % span) + span) % span - 100;
+      B(cx + c.w * 0.12, c.y - 10, c.w * 0.5, 12, 'rgba(255,226,190,0.6)');
+      B(cx + c.w * 0.45, c.y - 6, c.w * 0.4, 10, 'rgba(255,226,190,0.6)');
+      B(cx, c.y, c.w, 8, 'rgba(244,130,120,0.5)');
+    });
+
+    // Distant mountains
+    ridge(HZ - 4, 28, 0.011, 10, 0.031, shift * 0.15, '#6d4c8f', HZ + 4);
+    ridge(HZ - 4, 14, 0.017, 6, 0.05, shift * 0.2 + 90, '#7e5a9c', HZ + 4);
+
+    // Chennai skyline: tower blocks + gopuram
+    drawChennaiSkyline(shift * 0.55);
+
+    // Mid hills and near hills with tree clumps
+    ridge(HZ, 11, 0.02, 5, 0.05, shift * 0.7, '#2c6a39', HZ + 4);
+    ridge(HZ + 2, 6, 0.028, 3, 0.07, shift * 0.9 + 40, '#3a8a3e', HZ + 4);
+    for (let tx = 0; tx < W; tx += 34) {
+      const px = ((tx + shift * 0.9) % (W + 40) + (W + 40)) % (W + 40) - 20;
+      B(px, HZ - 7, 8, 8, '#1f5a2b');
+      B(px + 2, HZ - 11, 5, 5, '#2b7a38');
+    }
+
+    // Base ground under the road (so no sky peeks through)
+    ctx.fillStyle = '#2f7d32';
+    ctx.fillRect(0, HZ + 2, W, H - HZ);
+  }
+
+  function drawChennaiSkyline(shift) {
+    const horizon = HZ - 2;
+    const buildings = [
+      { x: 20, w: 75, h: 70 },
+      { x: 110, w: 95, h: 92 },
+      { x: 235, w: 65, h: 62 },
+      { x: 330, w: 110, h: 88 },
+      { x: 460, w: 85, h: 74 },
+      { x: 560, w: 95, h: 96 }
+    ];
+    const span = W + 160;
+    buildings.forEach((b, bi) => {
+      const bx = ((b.x + shift) % span + span) % span - 60;
+      B(bx, horizon - b.h, b.w, b.h, '#1f2547');
+      B(bx, horizon - b.h, b.w, 4, '#343a6b');
+      B(bx + b.w - 8, horizon - b.h, 8, b.h, '#171c3a');
+      for (let wy = horizon - b.h + 12; wy < horizon - 14; wy += 16) {
+        for (let wx = bx + 10; wx < bx + b.w - 14; wx += 18) {
+          if (((wx + wy) | 0) % 3 === 0) B(wx, wy, 6, 8, '#fbbf24');
+        }
+      }
+      if (bi % 2 === 0) B(bx + b.w / 2 - 6, horizon - b.h - 10, 12, 10, '#2a3161');
+    });
+    const gx = ((380 + shift) % span + span) % span - 60;
+    drawGopuram(gx, horizon, 1.4);
+
+    // Overhead tangled power wires
+    ctx.strokeStyle = '#1a1030';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, horizon - 52);
+    ctx.quadraticCurveTo(W * 0.5, horizon - 26, W, horizon - 56);
+    ctx.moveTo(0, horizon - 42);
+    ctx.quadraticCurveTo(W * 0.5, horizon - 16, W, horizon - 45);
+    ctx.stroke();
+  }
+
+  // =========================================================================
+  // 9. WORLD SPRITES: SHOPS, PALMS, POLES, SAREE PEDESTRIANS, BILLBOARDS
+  // =========================================================================
+  function drawWorldSprite(sp) {
+    const s0 = sp.scale * 0.48;
+    if (s0 <= 0.03) return;
+    const x = sp.screenX;
+    const y = sp.screenY;
+
+    if (sp.kind === 'shop') {
+      drawShop(sp.data, x, y, s0 * 2.4);
+    } else if (sp.kind === 'palm') {
+      drawPalm(x, y, s0 * 2.0);
+    } else if (sp.kind === 'pole') {
+      drawPole(sp.data, x, y, s0 * 2.0);
+    } else if (sp.kind === 'pedestrian') {
+      drawPedestrian(sp.data, x, y, s0 * 2.2);
+    } else if (sp.kind === 'billboard') {
+      drawBillboard(sp.data, x, y, s0 * 2.4);
+    } else if (sp.kind === 'junctionArch') {
+      drawArch(x, y, s0);
+    } else if (sp.kind === 'racer') {
+      drawRacerSprite(sp.data, x, y, s0 * 1.45);
+    } else if (sp.kind === 'player') {
+      drawPlayerAuto();
+    }
+  }
+
+  function drawShop(d, x, y, s) {
+    const bw = 180 * s;
+    const bh = 135 * s;
+    const wall = '#e7d9b0';
+    shadow(x + bw * 0.06, y, bw * 0.58, bh * 0.05, 0.38);
+
+    // Wall + shaded side + roof parapet
+    B(x - bw / 2, y - bh, bw, bh, wall);
+    B(x + bw / 2 - bw * 0.14, y - bh, bw * 0.14, bh, shade(wall, 0.78));
+    B(x - bw / 2, y - bh, bw, bh * 0.03, shade(wall, 1.25));
+    B(x - bw * 0.52, y - bh - 7 * s, bw * 1.04, 9 * s, '#57534e');
+    B(x - bw * 0.52, y - bh - 7 * s, bw * 1.04, 3 * s, '#78716c');
+    // 3D-angled roof fascia and sunlit edge
+    ctx.fillStyle = '#3f3f46';
+    ctx.beginPath();
+    ctx.moveTo(x - bw * 0.52, y - bh - 7 * s);
+    ctx.lineTo(x - bw * 0.36, y - bh - 18 * s);
+    ctx.lineTo(x + bw * 0.66, y - bh - 18 * s);
+    ctx.lineTo(x + bw * 0.52, y - bh - 7 * s);
+    ctx.closePath(); ctx.fill();
+    B(x - bw * 0.36, y - bh - 18 * s, bw * 1.02, 3 * s, '#d6a66a');
+
+    // Sun-faded plaster texture and side-wall masonry seams.
+    for (let row = 0; row < 5; row++) {
+      B(x - bw * 0.48, y - bh * (0.68 - row * 0.035), bw * 0.92, Math.max(1, 1.2 * s), 'rgba(120,80,55,0.22)');
+    }
+    B(x + bw * 0.42, y - bh * 0.78, bw * 0.035, bh * 0.48, 'rgba(60,45,42,0.28)');
+
+    // Signboard with bright trim
+    B(x - bw * 0.47, y - bh * 0.95, bw * 0.94, bh * 0.25, '#111827');
+    B(x - bw * 0.46, y - bh * 0.94, bw * 0.92, bh * 0.23, d.shop.bg);
+    B(x - bw * 0.46, y - bh * 0.94, bw * 0.92, bh * 0.025, d.shop.fg);
+
+    // Upper-floor windows (some lit)
+    for (let k = 0; k < 3; k++) {
+      const lit = (k + d.segment) % 2 === 0;
+      B(x - bw * 0.4 + k * bw * 0.3, y - bh * 0.63, bw * 0.2, bh * 0.17, '#1e293b');
+      B(x - bw * 0.38 + k * bw * 0.3, y - bh * 0.61, bw * 0.16, bh * 0.13, lit ? '#fbbf24' : '#334155');
+    }
+
+    // Striped canvas awning
+    for (let k = 0; k < 8; k++) {
+      B(x - bw * 0.54 + k * (bw * 1.08 / 8), y - bh * 0.43, bw * 1.08 / 8, bh * 0.15, k % 2 ? '#fafaf9' : d.shop.bg);
+    }
+    B(x - bw * 0.54, y - bh * 0.29, bw * 1.08, bh * 0.025, '#0b0f1a');
+
+    // Open shopfront with hanging goods
+    B(x - bw * 0.4, y - bh * 0.27, bw * 0.8, bh * 0.27, '#44403c');
+    B(x - bw * 0.37, y - bh * 0.25, bw * 0.74, bh * 0.24, '#f59e0b');
+    if (s > 0.18) {
+      const cols = ['#ec4899', '#22c55e', '#38bdf8', '#f43f5e', '#a855f7'];
+      for (let k = 0; k < 5; k++) {
+        B(x - bw * 0.33 + k * bw * 0.14, y - bh * 0.24, bw * 0.08, bh * 0.14, cols[(k + d.segment) % cols.length]);
+      }
+    }
+
+    if (s > 0.4) {
+      ctx.fillStyle = d.shop.fg;
+      ctx.font = `bold ${Math.max(6, Math.floor(11 * s))}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillText(d.shop.name, x, y - bh * 0.76);
+      ctx.textAlign = 'left';
+    }
+  }
+
+  function drawPalm(x, y, s) {
+    shadow(x + 6 * s, y, 22 * s, 4 * s, 0.35);
+    // Segmented, slightly curved trunk
+    let tx = x;
+    let ty = y;
+    for (let k = 0; k < 7; k++) {
+      const w = (12 - k * 0.8) * s;
+      tx = x + k * 1.6 * s;
+      ty = y - (k + 1) * 20 * s;
+      B(tx - w / 2, ty, w, 21 * s, k % 2 ? '#8b5a2b' : '#6f4518');
+    }
+    const topX = tx;
+    const topY = ty;
+
+    // Fronds
+    ctx.lineCap = 'round';
+    const angles = [-2.9, -2.35, -1.85, -1.3, -0.8, -0.25];
+    angles.forEach((a, i) => {
+      const ex = topX + Math.cos(a) * 54 * s;
+      const ey = topY + Math.sin(a) * 20 * s + 22 * s;
+      ctx.strokeStyle = i % 2 ? '#15803d' : '#1f9d4d';
+      ctx.lineWidth = Math.max(2, 6 * s);
+      ctx.beginPath();
+      ctx.moveTo(topX, topY);
+      ctx.quadraticCurveTo(topX + Math.cos(a) * 28 * s, topY + Math.sin(a) * 30 * s - 10 * s, ex, ey);
+      ctx.stroke();
+    });
+    ctx.lineCap = 'butt';
+
+    // Coconuts
+    const p = makeSprite(topX, topY, s, 0);
+    p.disc(-5, 8, 5, '#78350f');
+    p.disc(6, 9, 5, '#92400e');
+  }
+
+  function drawPole(d, x, y, s) {
+    shadow(x + 4 * s, y, 12 * s, 3 * s, 0.3);
+    B(x - 4 * s, y - 155 * s, 8 * s, 155 * s, '#94a3b8');
+    B(x + 1 * s, y - 155 * s, 3 * s, 155 * s, '#64748b');
+    B(x - 22 * s, y - 150 * s, 44 * s, 4 * s, '#334155');
+    B(x - 20 * s, y - 154 * s, 4 * s, 5 * s, '#e2e8f0');
+    B(x + 16 * s, y - 154 * s, 4 * s, 5 * s, '#e2e8f0');
+    ctx.strokeStyle = '#27243a';
+    ctx.lineWidth = Math.max(1, 1.5 * s);
+    ctx.beginPath();
+    ctx.moveTo(x - 22 * s, y - 150 * s);
+    ctx.quadraticCurveTo(x + 18 * s, y - 140 * s, x + 54 * s, y - 151 * s);
+    ctx.stroke();
+    if (d.segment % 30 === 0) {
+      B(x - 11 * s, y - 118 * s, 22 * s, 26 * s, '#475569');
+      B(x - 11 * s, y - 118 * s, 22 * s, 4 * s, '#64748b');
+    }
+  }
+
+  function drawPedestrian(d, x, y, s) {
+    const p = makeSprite(x, y, s, 0);
+    shadow(x + 3 * s, y, 15 * s, 3.5 * s, 0.4);
+    // Saree body with pallu and gold zari border
+    p.r(-10, -54, 20, 54, d.sareeColor);
+    p.r(-10, -54, 8, 28, shade(d.sareeColor, 1.3));
+    p.r(3, -54, 7, 54, shade(d.sareeColor, 0.78));
+    p.r(-10, -10, 20, 6, '#facc15');
+    // Hair, braid, jasmine, head
+    p.disc(0, -62, 8, '#8d5524');
+    p.r(-8, -70, 16, 7, '#111827');
+    p.r(-2, -64, 4, 28, '#111827');
+    p.r(-7, -62, 14, 3, '#ffffff');
+    // Shopping bag
+    p.r(10, -34, 10, 14, '#38bdf8');
+    p.r(10, -34, 10, 3, '#bae6fd');
+    // Feet
+    p.r(-7, -3, 5, 3, '#7c2d12');
+    p.r(2, -3, 5, 3, '#7c2d12');
+  }
+
+  function drawBillboard(d, x, y, s) {
+    const bw = 200 * s;
+    const bh = 84 * s;
+    const baseY = y - 112 * s;
+    shadow(x, y, bw * 0.4, 5 * s, 0.35);
+    // Steel posts
+    B(x - bw * 0.36, baseY, 8 * s, 112 * s, '#475569');
+    B(x + bw * 0.36 - 8 * s, baseY, 8 * s, 112 * s, '#475569');
+    // Board
+    B(x - bw / 2 - 5 * s, baseY - bh - 5 * s, bw + 10 * s, bh + 10 * s, '#0b0f1a');
+    B(x - bw / 2, baseY - bh, bw, bh, d.ad.bg);
+    B(x - bw / 2, baseY - bh, bw, 5 * s, shade(d.ad.bg, 1.5));
+    B(x - bw / 2, baseY - 9 * s, bw, 9 * s, shade(d.ad.bg, 0.65));
+    // Lamp row
+    for (let k = 0; k < 4; k++) {
+      B(x - bw * 0.4 + k * bw * 0.27, baseY - bh - 12 * s, 8 * s, 7 * s, '#fef9c3');
+    }
+    if (s > 0.4) {
+      ctx.fillStyle = d.ad.fg;
+      ctx.font = `bold ${Math.max(6, Math.floor(15 * s))}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillText(d.ad.name, x, baseY - bh * 0.42);
+      ctx.textAlign = 'left';
+    } else {
+      B(x - bw * 0.3, baseY - bh * 0.6, bw * 0.6, bh * 0.22, d.ad.fg);
+    }
+  }
+
+  function drawArch(x, y, s0) {
+    const aw = 1500 * s0;
+    const ah = 560 * s0;
+    const bh = 120 * s0;
+    // Striped pillars
+    for (let k = 0; k < 7; k++) {
+      const c = k % 2 ? '#f8fafc' : '#dc2626';
+      B(x - aw / 2, y - ah + k * 80 * s0, 36 * s0, 80 * s0, c);
+      B(x + aw / 2 - 36 * s0, y - ah + k * 80 * s0, 36 * s0, 80 * s0, c);
+    }
+    // Banner
+    B(x - aw / 2, y - ah - 6 * s0, aw, bh + 12 * s0, '#0b0f1a');
+    B(x - aw / 2, y - ah, aw, bh, '#facc15');
+    B(x - aw / 2, y - ah, aw, 10 * s0, '#fef08a');
+    // Chequered strip
+    for (let k = 0; k < 24; k++) {
+      B(x - aw / 2 + k * aw / 24, y - ah + bh, aw / 24, 20 * s0, k % 2 ? '#f8fafc' : '#0b0f1a');
+    }
+    if (s0 > 0.1) {
+      ctx.fillStyle = '#0f172a';
+      ctx.font = `bold ${Math.max(8, Math.floor(60 * s0))}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillText('T. NAGAR JUNCTION', x, y - ah + bh * 0.66);
+      ctx.textAlign = 'left';
+    }
+  }
+
+  // =========================================================================
+  // 10. RIVAL SPRITES: OFFICE-ATTIRE BIKERS & RIVAL AUTOS
+  // =========================================================================
+  function drawRacerSprite(r, x, y, s) {
+    ctx.save();
+    if (r.flashFrames > 0) ctx.filter = 'brightness(0) invert(1)';
+    if (r.type === 'auto') {
+      if (r.knockedDown) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(r.spin || 1.25);
+        drawRivalAuto(r, 0, 0, s);
+        ctx.restore();
+        drawStars(x, y - 30 * s, s);
+      } else {
+        drawRivalAuto(r, x, y, s);
+      }
+    } else if (r.knockedDown) {
+      drawFallenBike(r, x, y, s);
+    } else {
+      drawRivalBike(r, x, y, s);
+    }
+    ctx.restore();
+  }
+
+  function drawStars(x, y, s) {
+    const t = performance.now() * 0.006;
+    for (let k = 0; k < 3; k++) {
+      const a = t + k * 2.1;
+      const sx = x + Math.cos(a) * 26 * s;
+      const sy = y + Math.sin(a) * 7 * s;
+      B(sx - 3 * s, sy - 1 * s, 6 * s, 2 * s, '#fde047');
+      B(sx - 1 * s, sy - 3 * s, 2 * s, 6 * s, '#fde047');
+    }
+  }
+
+  function drawFallenBike(r, x, y, s) {
+    const p = makeSprite(x, y, s, 0);
+    shadow(x, y, 44 * s, 8 * s, 0.45);
+    p.disc(-34, -9, 9, '#05070c');
+    p.disc(34, -9, 9, '#05070c');
+    p.r(-34, -16, 68, 10, r.color);
+    p.r(-30, -16, 40, 3, shade(r.color, 1.4));
+    p.r(-8, -28, 30, 12, r.shirt);
+    p.r(14, -28, 8, 12, shade(r.shirt, 0.78));
+    p.r(-22, -26, 14, 8, '#1e293b');
+    p.disc(-30, -22, 9, '#0f172a');
+    p.r(-31, -32, 2, 6, r.color);
+    drawStars(x, y - 40 * s, s);
+  }
+
+  function drawRivalBike(r, cx, cy, s) {
+    const t = performance.now() * 0.012;
+    const p = makeSprite(cx, cy, s, r.wobble * 0.8);
+    shadow(cx + 5 * s, cy + 1 * s, 32 * s, 6.5 * s, 0.45);
+
+    // Rear tyre with highlight
+    p.r(-6, -28, 12, 28, '#05070c');
+    p.r(-4, -26, 2, 22, '#2a3342');
+
+    // Chrome exhaust
+    p.r(10, -24, 5, 20, '#6b7280');
+    p.r(11, -24, 2, 20, '#e5e7eb');
+
+    // Tail fairing in rival colour
+    p.r(-12, -41, 24, 16, '#000000');
+    p.r(-11, -40, 22, 14, r.color);
+    p.r(-10, -40, 9, 3, shade(r.color, 1.5));
+    p.r(-11, -29, 22, 3, shade(r.color, 0.65));
+
+    // Glowing tail light + plate
+    p.r(-5, -37, 10, 4, '#ff3b3b');
+    p.r(-3, -36, 3, 2, '#fecaca');
+    p.r(-5, -31, 10, 4, '#f1f5f9');
+
+    // Trousers and shoes
+    p.r(-13, -54, 9, 17, '#1e293b');
+    p.r(4, -54, 9, 17, '#1e293b');
+    p.r(-14, -39, 7, 4, '#0b0f1a');
+    p.r(7, -39, 7, 4, '#0b0f1a');
+
+    // Crisp office shirt torso with shading and wrinkles
+    p.r(-13, -80, 26, 28, r.shirt);
+    p.r(6, -80, 7, 28, shade(r.shirt, 0.76));
+    p.r(-13, -80, 26, 3, shade(r.shirt, 0.88));
+    p.r(-4, -66, 2, 10, shade(r.shirt, 0.86));
+
+    // Arms to handlebars + mirrors
+    p.r(-20, -76, 7, 24, shade(r.shirt, 0.92));
+    p.r(13, -76, 7, 24, shade(r.shirt, 0.78));
+    p.r(-21, -54, 8, 5, '#8d5524');
+    p.r(13, -54, 8, 5, '#8d5524');
+    p.r(-24, -56, 48, 3, '#111827');
+    p.r(-27, -64, 4, 9, '#1f2937');
+    p.r(23, -64, 4, 9, '#1f2937');
+
+    // Tie flapping over the shoulder in the wind
+    const f = Math.sin(t + r.z * 0.001) * 2.5;
+    p.r(10 + f, -78, 4, 14, r.tie);
+    p.r(12 + f * 1.5, -66, 4, 7, shade(r.tie, 0.75));
+
+    // Helmet with visor shine and rival-colour stripe
+    p.disc(0, -89, 12, '#0f172a');
+    p.r(-7, -97, 7, 3, '#64748b');
+    p.r(-1, -100, 2, 11, r.color);
+  }
+
+  function drawRivalAuto(r, cx, cy, s) {
+    const p = makeSprite(cx, cy, s, r.wobble * 0.6);
+    shadow(cx, cy + 1 * s, 48 * s, 8 * s, 0.45);
+
+    // Wheels
+    p.r(-34, -22, 13, 22, '#05070c');
+    p.r(21, -22, 13, 22, '#05070c');
+    p.r(-32, -20, 2, 16, '#2a3342');
+    p.r(23, -20, 2, 16, '#2a3342');
+
+    // Lower body
+    p.r(-38, -46, 76, 32, '#2b1d04');
+    p.r(-36, -44, 72, 28, r.color);
+    p.r(-34, -44, 68, 5, shade(r.color, 1.35));
+    p.r(-36, -22, 72, 6, shade(r.color, 0.68));
+
+    // Warm sunset bounce on the lower body and beveled canopy roof
+    p.r(-34, -42, 68, 3, 'rgba(255,190,90,0.65)');
+    // Black canopy
+    p.r(-36, -84, 72, 40, '#05070c');
+    p.r(-34, -82, 68, 36, '#171c2b');
+    p.r(-32, -82, 64, 4, '#3b4560');
+    p.r(-28, -86, 56, 3, '#64748b');
+    p.r(-36, -48, 5, 24, 'rgba(255,190,90,0.45)');
+    p.r(-22, -74, 44, 17, '#0b1020');
+    p.r(-20, -72, 40, 13, '#38bdf8');
+    p.r(-18, -71, 13, 5, '#bae6fd');
+    p.r(-5, -68, 10, 8, '#1e293b');
+
+    // Tail lights, plate, bumper, exhaust
+    p.r(-33, -34, 10, 8, '#ef4444');
+    p.r(-32, -33, 3, 3, '#fecaca');
+    p.r(23, -34, 10, 8, '#ef4444');
+    p.r(-10, -30, 20, 9, '#000000');
+    p.r(-9, -29, 18, 7, '#facc15');
+    p.r(-36, -17, 72, 4, '#cbd5e1');
+    p.r(27, -12, 7, 10, '#6b7280');
+  }
+
+  // =========================================================================
+  // 11. PLAYER AUTO-RICKSHAW (Rear-3/4 Pixel Art, shaded & outlined)
+  // =========================================================================
+  function drawPlayerAuto() {
+    const bounce = player.speed > 100 ? Math.sin(performance.now() * 0.04) * 2.5 : 0;
+    const ax = W / 2 + player.steerLean * 16;
+    const ay = H - 24 + bounce;
+    playerDraw.ax = ax;
+    playerDraw.ay = ay;
+    const leanK = player.steerLean * 0.27;
+    playerDraw.lean = leanK;
+    const p = makeSprite(ax, ay, 1, leanK);
+
+    const braking = keys['KeyS'] || keys['ArrowDown'];
+    const flash = player.hitFlash > 0 && Math.floor(player.hitFlash * 20) % 2 === 0;
+    const spd = player.speed / player.maxSpeed;
+
+    ctx.save();
+    if (flash) ctx.globalAlpha = 0.65;
+
+    // Ground shadow
+    shadow(ax, ay + 6, 80, 15, 0.5);
+
+    // Tailpipe
+    p.r(46, -16, 12, 8, '#6b7280');
+    p.r(46, -16, 12, 2, '#e5e7eb');
+    p.r(56, -15, 3, 6, '#0b0f1a');
+
+    // Rear tyres with scrolling tread
+    const treadShift = (player.z * 0.05) % 7;
+    p.r(-64, -34, 22, 36, '#05070c');
+    p.r(42, -34, 22, 36, '#05070c');
+    for (let k = 0; k < 5; k++) {
+      const ty = -34 + ((k * 7 + treadShift) % 34);
+      p.r(-62, ty, 18, 3, '#2d3748');
+      p.r(44, ty, 18, 3, '#2d3748');
+    }
+    p.r(-64, -34, 3, 36, '#1f2937');
+    p.r(61, -34, 3, 36, '#1f2937');
+
+    // Mudguards
+    p.r(-66, -40, 28, 8, '#1e293b');
+    p.r(-66, -40, 28, 2, '#475569');
+    p.r(38, -40, 28, 8, '#1e293b');
+    p.r(38, -40, 28, 2, '#475569');
+
+    // Bajaj-style yellow body tub: outline, base, bevels, shading
+    p.r(-57, -81, 114, 59, '#2b1d04');
+    p.r(-55, -79, 110, 55, '#eab308');
+    p.r(-51, -77, 102, 8, '#fde68a');
+    p.r(-55, -79, 8, 55, '#fcd34d');
+    p.r(47, -79, 8, 55, '#a16207');
+    p.r(-55, -34, 110, 10, '#ca8a04');
+    p.r(-31, -30, 62, 3, '#a16207');
+    p.r(-31, -26, 62, 2, '#a16207');
+
+    // Black tarpaulin canopy (stair-stepped trapezoid, outlined)
+    const rows = 16;
+    for (let k = 0; k < rows; k++) {
+      const halfW = 41 + (k / (rows - 1)) * 7;
+      p.r(-halfW - 2, -138 + k * 4, halfW * 2 + 4, 4, '#000000');
+    }
+    for (let k = 0; k < rows; k++) {
+      const halfW = 41 + (k / (rows - 1)) * 7;
+      p.r(-halfW, -138 + k * 4, halfW * 2, 4, '#111827');
+      p.r(-halfW, -138 + k * 4, 5, 4, '#232c45');
+      p.r(halfW - 5, -138 + k * 4, 5, 4, '#05070c');
+    }
+    p.r(-43, -141, 86, 5, '#facc15');
+    p.r(-43, -141, 86, 2, '#fef08a');
+    p.r(-2, -134, 4, 52, '#0b0f1a');
+
+    // Rear cutout window with passenger (pink saree, jasmine)
+    const sway = Math.sin(performance.now() * 0.01) * spd * 2;
+    p.r(-31, -127, 62, 38, '#000000');
+    p.r(-29, -125, 58, 34, '#1e293b');
+    p.r(-27, -123, 12, 4, '#475569');
+    p.r(sway - 15, -105, 30, 14, '#ec4899');
+    p.r(sway + 5, -105, 10, 14, '#be185d');
+    p.r(sway - 15, -93, 30, 2, '#facc15');
+    p.disc(sway, -113, 8, '#8d5524');
+    p.r(sway - 8, -123, 16, 6, '#111827');
+    p.r(sway - 7, -115, 14, 3, '#ffffff');
+
+    // Tail lights glow brighter when braking
+    if (braking) {
+      ctx.fillStyle = 'rgba(255,60,60,0.35)';
+      B(ax - 60, ay - 58, 30, 24, 'rgba(255,60,60,0.35)');
+      B(ax + 30, ay - 58, 30, 24, 'rgba(255,60,60,0.35)');
+    }
+    const tail = braking ? '#ff5252' : '#dc2626';
+    p.r(-52, -52, 18, 12, '#000000');
+    p.r(-51, -51, 16, 10, tail);
+    p.r(-49, -50, 5, 3, '#fecaca');
+    p.r(34, -52, 18, 12, '#000000');
+    p.r(35, -51, 16, 10, tail);
+    p.r(37, -50, 5, 3, '#fecaca');
+
+    // Chrome rear bumper
+    p.r(-60, -28, 120, 6, '#cbd5e1');
+    p.r(-60, -28, 120, 2, '#f8fafc');
+    p.r(-60, -24, 120, 2, '#64748b');
+
+    // Yellow & black "TN-09" plate (text drawn crisp in overlay)
+    p.r(-25, -51, 50, 20, '#000000');
+    p.r(-23, -49, 46, 16, '#facc15');
+
+    // COMBAT ANIMATIONS: khaki-sleeve punch & boot kick
+    if (player.attackSide === 'right') {
+      const t = Math.min(1, 1 - player.attackTimer / 0.26);
+      const reach = 46 * (0.55 + 0.45 * Math.sin(t * Math.PI));
+      p.r(46, -94, reach + 4, 18, '#000000');
+      p.r(48, -92, reach, 14, '#a8905a');
+      p.r(48, -80, reach, 3, '#7c6a3a');
+      p.r(46, -96, 10, 22, '#8b7a45');
+      p.disc(50 + reach + 8, -85, 18, '#000000');
+      p.disc(50 + reach + 8, -85, 14, '#c68642');
+      p.r(50 + reach + 2, -96, 10, 3, '#e8a860');
+      p.r(60, -104, 40, 2, 'rgba(255,255,255,0.7)');
+      p.r(56, -70, 44, 2, 'rgba(255,255,255,0.7)');
+    } else if (player.attackSide === 'left') {
+      const t = Math.min(1, 1 - player.attackTimer / 0.26);
+      const reach = 52 * (0.55 + 0.45 * Math.sin(t * Math.PI));
+      p.r(-48 - reach - 2, -68, reach + 6, 20, '#000000');
+      p.r(-46 - reach, -66, reach, 16, '#a8905a');
+      p.r(-46 - reach, -54, reach, 3, '#7c6a3a');
+      p.r(-62 - reach, -76, 20, 28, '#000000');
+      p.r(-60 - reach, -74, 16, 24, '#0b0f1a');
+      p.r(-60 - reach, -74, 4, 20, '#374151');
+      p.r(-64 - reach, -52, 24, 4, '#374151');
+      p.r(-110, -80, 44, 2, 'rgba(255,255,255,0.7)');
+      p.r(-106, -44, 40, 2, 'rgba(255,255,255,0.7)');
+    }
+
+    ctx.restore();
+  }
+
+  function drawCutscenePassenger() {
+    // Animated saree passenger walking from the left kerb into the auto
+    const progress = Math.min(1, cutsceneTime / 2.4);
+    const startX = W * 0.22;
+    const endX = W * 0.48;
+    const px = startX + (endX - startX) * progress;
+    const walk = Math.sin(cutsceneTime * 11);
+    const py = H - 36 - Math.abs(walk) * 5;
+
+    if (progress < 0.96) {
+      const p = makeSprite(px, py, 1.25, 0);
+      shadow(px, py + 4, 18, 4, 0.45);
+      // Pink & gold silk saree
+      p.r(-11, -52, 22, 52, '#ec4899');
+      p.r(-11, -52, 8, 30, '#f472b6');
+      p.r(4, -52, 7, 52, '#be185d');
+      p.r(-11, -10, 22, 6, '#facc15');
+      p.r(-11, -50, 22, 4, '#fde047');
+      // Head, jasmine garland (Malli Poo)
+      p.disc(0, -61, 8, '#92400e');
+      p.r(-8, -69, 16, 6, '#111827');
+      p.r(-6, -63, 12, 3, '#ffffff');
+      // Shopping bags
+      p.r(12, -26, 12, 16, '#38bdf8');
+      p.r(12, -26, 12, 3, '#bae6fd');
+      p.r(-23, -24, 11, 15, '#f59e0b');
+      // Feet
+      p.r(-7, walk > 0 ? -5 : -2, 6, 4, '#7c2d12');
+      p.r(2, walk > 0 ? -2 : -5, 6, 4, '#7c2d12');
+    }
+  }
+
+  // =========================================================================
+  // 12. CRISP OVERLAY: SPEED LINES, PARTICLES, POPUPS, HUD, VIGNETTE
+  // =========================================================================
+  function drawOverlay() {
+    const S = screen;
+    S.save();
+    if (screenShake > 0) {
+      const q = screenShake * 0.45;
+      S.translate((Math.random() - 0.5) * q, (Math.random() - 0.5) * q);
+    }
+
+    // Bright white arcade slash arcs at the actual melee strike side.
+    impactArcs.forEach((a) => {
+      const fade = Math.max(0, a.life / 0.22);
+      S.save();
+      S.globalAlpha = fade;
+      S.strokeStyle = '#ffffff';
+      S.lineWidth = 5;
+      S.beginPath();
+      const dir = a.side === 'right' ? 1 : -1;
+      S.arc(a.x, a.y, 28 + (1 - fade) * 24, dir > 0 ? 2.9 : 0.25, dir > 0 ? 5.7 : 3.4, dir < 0);
+      S.stroke();
+      S.strokeStyle = '#fff2a8';
+      S.lineWidth = 2;
+      S.beginPath();
+      S.moveTo(a.x - dir * 18, a.y + 8);
+      S.lineTo(a.x + dir * 24, a.y - 15);
+      S.stroke();
+      S.restore();
+    });
+
+    // Speed streaks radiating from the vanishing point
+    if (currentState === STATE.RACING) {
+      const sr = player.speed / player.maxSpeed;
+      if (sr > 0.5) {
+        S.strokeStyle = `rgba(255,255,255,${(0.08 + 0.14 * sr).toFixed(2)})`;
+        S.lineWidth = 2;
+        const cx = W / 2;
+        const cy = HZ;
+        const tn = performance.now() * 0.0016 * (0.6 + sr);
+        for (let i = 0; i < 14; i++) {
+          const t = (tn + i * 0.173) % 1;
+          const a = Math.PI * (0.06 + 0.88 * (i / 13));
+          const r0 = 130 + t * 330;
+          const r1 = r0 + 24 + 60 * sr * t;
+          S.beginPath();
+          S.moveTo(cx + Math.cos(a) * r0 * 1.5, cy + Math.sin(a) * r0);
+          S.lineTo(cx + Math.cos(a) * r1 * 1.5, cy + Math.sin(a) * r1);
+          S.stroke();
+        }
+      }
+    }
+
+    // Dust & exhaust particles
+    particles.forEach((p) => {
+      S.fillStyle = p.color;
+      const sz = p.size || 5;
+      S.fillRect(Math.round(p.x), Math.round(p.y), sz, sz);
+    });
+
+    // Comic hit popups with outline
+    hitPopups.forEach((pop) => {
+      S.font = 'bold 16px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+      S.textAlign = 'center';
+      S.fillStyle = '#000000';
+      S.fillText(pop.text, pop.x - 2, pop.y);
+      S.fillText(pop.text, pop.x + 2, pop.y);
+      S.fillText(pop.text, pop.x, pop.y - 2);
+      S.fillText(pop.text, pop.x, pop.y + 2);
+      S.fillStyle = pop.color;
+      S.fillText(pop.text, pop.x, pop.y);
+    });
+
+    // License plate lettering on the player's auto
+    S.font = 'bold 8px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+    S.textAlign = 'center';
+    S.fillStyle = '#000000';
+    S.fillText('TN-09', playerDraw.ax + playerDraw.lean * 41 * 0.22 * 1, playerDraw.ay - 36);
+
+    // Cutscene speech bubble
+    if (currentState === STATE.CUTSCENE) {
+      const progress = Math.min(1, cutsceneTime / 2.4);
+      S.fillStyle = 'rgba(15, 23, 42, 0.92)';
+      S.fillRect(W / 2 - 210, 68, 420, 44);
+      S.strokeStyle = '#facc15';
+      S.lineWidth = 2;
+      S.strokeRect(W / 2 - 210, 68, 420, 44);
+      S.fillStyle = '#fef08a';
+      S.font = '10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+      S.textAlign = 'center';
+      S.fillText(
+        progress < 0.95 ? '"ANNA, T. NAGAR JUNCTION FAST!"' : '"READY! STEP ON IT ANNA!"',
+        W / 2,
+        95
+      );
+    }
+
+    if (currentState === STATE.RACING || currentState === STATE.CUTSCENE) {
+      drawArcadeHud();
+    }
+
+    // Soft vignette
+    const vg = S.createRadialGradient(W / 2, H / 2, H * 0.45, W / 2, H / 2, W * 0.72);
+    vg.addColorStop(0, 'rgba(0,0,0,0)');
+    vg.addColorStop(1, 'rgba(0,0,0,0.38)');
+    S.fillStyle = vg;
+    S.fillRect(0, 0, W, H);
+    S.textAlign = 'left';
+    S.restore();
+  }
+
+  function drawArcadeHud() {
+    const S = screen;
+    // Semi-transparent 16-bit HUD strip
+    S.fillStyle = 'rgba(9, 13, 22, 0.88)';
+    S.fillRect(0, 0, W, 38);
+    S.fillStyle = '#facc15';
+    S.fillRect(0, 36, W, 2);
+    S.fillStyle = '#a16207';
+    S.fillRect(0, 38, W, 2);
+
+    const maxTrackZ = (TOTAL_SEGMENTS - 20) * SEGMENT_LENGTH;
+    const remainingMeters = Math.max(0, Math.ceil((maxTrackZ - player.z) / 276));
+    const rank = racers.filter((r) => r.z > player.z).length + 1;
+    const rankStr = rank === 1 ? '1ST' : rank === 2 ? '2ND' : rank === 3 ? '3RD' : `${rank}TH`;
+    const kmh = Math.round((player.speed / player.maxSpeed) * 95);
+
+    S.font = '9px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+    S.textAlign = 'left';
+
+    // Distance
+    S.fillStyle = '#94a3b8';
+    S.fillText('JUNCTION:', 12, 16);
+    S.fillStyle = '#facc15';
+    S.fillText(`${remainingMeters}m`, 12, 30);
+
+    // Position
+    S.fillStyle = '#94a3b8';
+    S.fillText('POS:', 145, 16);
+    S.fillStyle = rank === 1 ? '#34d399' : '#fbbf24';
+    S.fillText(`${rankStr}/8`, 145, 30);
+
+    // Speedometer
+    S.fillStyle = '#94a3b8';
+    S.fillText('SPEED:', 255, 16);
+    S.fillStyle = '#38bdf8';
+    S.fillText(`${kmh} KM/H`, 255, 30);
+
+    // Health Bar
+    S.fillStyle = '#94a3b8';
+    S.fillText('AUTO HP:', 415, 16);
+    S.fillStyle = '#1e293b';
+    S.fillRect(415, 21, 120, 10);
+    S.fillStyle = player.health > 50 ? '#22c55e' : player.health > 25 ? '#eab308' : '#ef4444';
+    S.fillRect(415, 21, (player.health / 100) * 120, 10);
+    S.fillStyle = 'rgba(255,255,255,0.25)';
+    S.fillRect(415, 21, (player.health / 100) * 120, 3);
+    S.strokeStyle = '#f8fafc';
+    S.lineWidth = 1;
+    S.strokeRect(415, 21, 120, 10);
+
+    // KOs
+    S.fillStyle = '#94a3b8';
+    S.fillText('KOs:', 560, 16);
+    S.fillStyle = '#f43f5e';
+    S.fillText(`${player.kos}`, 560, 30);
+
+    // Race progress strip with rival markers
+    const bx = 12;
+    const bw = W - 24;
+    S.fillStyle = 'rgba(9, 13, 22, 0.8)';
+    S.fillRect(bx - 2, 44, bw + 4, 8);
+    S.fillStyle = '#334155';
+    S.fillRect(bx, 47, bw, 2);
+    S.fillStyle = '#f8fafc';
+    S.fillRect(bx + bw - 3, 43, 3, 10);
+    racers.forEach((r) => {
+      const t = Math.max(0, Math.min(1, r.z / maxTrackZ));
+      S.fillStyle = r.color;
+      S.fillRect(bx + t * bw - 2, 45, 4, 6);
+    });
+    const pt = Math.max(0, Math.min(1, player.z / maxTrackZ));
+    S.fillStyle = '#000';
+    S.fillRect(bx + pt * bw - 4, 43, 8, 10);
+    S.fillStyle = '#facc15';
+    S.fillRect(bx + pt * bw - 3, 44, 6, 8);
+  }
+
+  // =========================================================================
+  // 13. MAIN ANIMATION LOOP
+  // =========================================================================
+  let lastFrameTime = performance.now();
+
+  function mainLoop(now) {
+    const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
+    lastFrameTime = now;
+
+    update(dt);
+    render();
+
+    requestAnimationFrame(mainLoop);
+  }
+
+  window.addEventListener('load', () => {
+    buildTrack();
+    spawnRacers();
+    requestAnimationFrame(mainLoop);
+  });
+})();
+</script>
+</body>
+</html>
